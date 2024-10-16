@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <stdlib.h>
+struct Node {
+    int data;
+    struct Node* next;
+};
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+void printList(struct Node* head) {
+    struct Node* temp = head;
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+void insertMiddle(struct Node** head, int data) {
+    if (*head == NULL) {
+        *head = createNode(data);
+        return;
+    }
+
+    struct Node *slow = *head, *fast = *head;
+    struct Node* prev = NULL;
+    while (fast != NULL && fast->next != NULL) {
+        prev = slow;
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    struct Node* newNode = createNode(data);
+    newNode->next = slow;
+
+    if (prev != NULL) {
+        prev->next = newNode;
+    } else {
+        *head = newNode;
+    }
+}
+void deleteMiddle(struct Node** head) {
+    if (*head == NULL || (*head)->next == NULL) {
+        return;  // Empty list or single node case
+    }
+
+    struct Node *slow = *head, *fast = *head;
+    struct Node* prev = NULL;
+    while (fast != NULL && fast->next != NULL) {
+        prev = slow;
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    if (prev != NULL) {
+        prev->next = slow->next;  // Unlink the middle node
+        free(slow);  // Free the memory of the middle node
+    }
+}
+int main() {
+    struct Node* head = NULL;
+    head = createNode(1);
+    head->next = createNode(2);
+    head->next->next = createNode(4);
+    head->next->next->next = createNode(5);
+
+    printf("Original List: ");
+    printList(head);
+    insertMiddle(&head, 3);
+    printf("List after inserting 3 in the middle: ");
+    printList(head);
+    deleteMiddle(&head);
+    printf("List after deleting the middle node: ");
+    printList(head);
+
+    return 0;
+}
